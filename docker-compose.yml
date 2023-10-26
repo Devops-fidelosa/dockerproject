@@ -1,0 +1,48 @@
+version: "3.9"
+services:
+  fidevdb:
+    build:
+      context: ./Docker-files/db
+    image: fidelosa/fidevdb
+    container_name: fidevdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - fidevdbdata:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=fidevpass
+      
+  fidevcache01:
+    image: memcached
+    ports:
+      - "11211:11211"
+  
+  fidevmq01:
+    image: rabbitmq
+    ports:
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+  
+  fidevapp:
+    build:
+      context: ./Docker-files/app
+    image: fidelosa/fidevapp
+    container_name: fidevapp
+    ports:
+      - "8080:8080"
+    volumes:
+      - fidevappdata:/usr/local/tomcat/webapps
+
+  fidevweb:
+    build:
+      context: ./Docker-files/web
+    image: fidelosa/fidevweb
+    container_name: fidevweb
+    ports:
+      - "80:80"
+
+volumes:
+  fidevdbdata: {}
+  fidevappdata: {}
